@@ -1,0 +1,57 @@
+server:
+  port: 8084    # -> can remove all this after making the config files and clearly mentioning their port numbers in the .properties files there
+
+spring:
+  application:
+    name: wallet-service
+  profiles:
+    active: dev,prod
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/walletdb
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+logging:
+  level:
+    org.springframework.cloud.sleuth: DEBUG
+    com.tnf.wallet_service: DEBUG  # --> Technically don't need this anymore as this will take all logs below and put in centralised
+
+management:
+  endpoints:
+    web:
+      exposure:
+        #NOTICE: No 'gateway' here
+        include: health,info,metrics,beans,httptrace,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0 # Will trace all requests
+    propagation: # In which format data is being sent 
+      type: b3 # Standards thru which info is sent in the header (allows hyphens in code) - Zipkin type is b3 - how is it being sent
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+info:
+  app:
+    name: Wallet Service
+    version: 1.0.0
+    description: Manages Wallet 
+
+springdoc:
+  api-docs:
+    path: /api/wallets/v3/api-docs
+  swagger-ui:
+    path: /api/wallets/swagger-ui.html
